@@ -1,0 +1,80 @@
+AWSTemplateFormatVersion: 2010-09-09
+Metadata:
+  "AWS::CloudFormation::Designer":
+    1d95146e-d287-44d5-900b-11fad4a7ccac:
+      size:
+        width: 60
+        height: 60
+      position:
+        x: 560
+        "y": -40
+      z: 0
+      embeds: []
+      isassociatedwith:
+        - 7e2a5372-740f-4c5e-8539-6a65ec3048d3
+    7e2a5372-740f-4c5e-8539-6a65ec3048d3:
+      size:
+        width: 60
+        height: 60
+      position:
+        x: 420
+        "y": -40
+      z: 0
+      embeds: []
+    17e7c4c4-6b3b-4547-9a9c-0082c4db0350:
+      source:
+        id: 1d95146e-d287-44d5-900b-11fad4a7ccac
+        selector: "g:nth-child(1) g:nth-child(4) g:nth-child(7) circle:nth-child(1)     "
+        port: "AWS::RefLink-AWS::EC2::SecurityGroup-SecurityGroupIds"
+      target:
+        id: 7e2a5372-740f-4c5e-8539-6a65ec3048d3
+      z: 2
+    e08afac2-1853-4719-8c90-2089a035ccef:
+      source:
+        id: 1d95146e-d287-44d5-900b-11fad4a7ccac
+        selector: "g:nth-child(1) g:nth-child(4) g:nth-child(7) circle:nth-child(1)     "
+        port: "AWS::RefLink-AWS::EC2::SecurityGroup-SecurityGroupIds"
+      target:
+        id: 7e2a5372-740f-4c5e-8539-6a65ec3048d3
+      z: 2
+    54829429-98ef-45bb-ae8e-ddaace09aebd:
+      source:
+        id: 1d95146e-d287-44d5-900b-11fad4a7ccac
+        selector: "g:nth-child(1) g:nth-child(4) g:nth-child(7) circle:nth-child(1)     "
+        port: "AWS::RefLink-AWS::EC2::SecurityGroup-SecurityGroupIds"
+      target:
+        id: 7e2a5372-740f-4c5e-8539-6a65ec3048d3
+      z: 2
+Resources:
+  AppEc2One:
+    Type: "AWS::EC2::Instance"
+    Properties:
+      ImageId: ami-0b2ca94b5b49e0132
+      InstanceType: t2.nano
+      KeyName: app-key
+      AvailabilityZone: us-west-1a
+      SecurityGroupIds:
+        - !Ref AppSecGroup
+    Metadata:
+      "AWS::CloudFormation::Designer":
+        id: 1d95146e-d287-44d5-900b-11fad4a7ccac
+  AppSecGroup:
+    Type: "AWS::EC2::SecurityGroup"
+    Properties:
+      GroupDescription: The security group for the app.
+      SecurityGroupIngress:
+        - IpProtocol: tcp
+          FromPort: 80
+          ToPort: 80
+          CidrIp: 0.0.0.0/0
+        - IpProtocol: tcp
+          FromPort: 443
+          ToPort: 443
+          CidrIp: 0.0.0.0/0
+        - IpProtocol: tcp
+          FromPort: 3000
+          ToPort: 3005
+          CidrIp: 0.0.0.0/0
+    Metadata:
+      "AWS::CloudFormation::Designer":
+        id: 7e2a5372-740f-4c5e-8539-6a65ec3048d3
