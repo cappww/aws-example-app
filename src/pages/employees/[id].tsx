@@ -17,10 +17,7 @@ export default function EmployeeProfile() {
 
   return (
     <Card style={{ width: "18rem" }}>
-      <Card.Img
-        variant="top"
-        src="https://external-content.duckduckgo.com/iu/?u=https%3A%2F%2Fimages.askmen.com%2F1080x540%2F2016%2F01%2F25-021526-facebook_profile_picture_affects_chances_of_getting_hired.jpg&f=1&nofb=1"
-      />
+      <Card.Img variant="top" src="/img/some-guy.jpeg" />
       <Card.Body>
         <Card.Title>
           {data.first_name} {data.last_name}
