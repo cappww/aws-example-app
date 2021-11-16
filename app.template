@@ -1,10 +1,14 @@
 AWSTemplateFormatVersion: 2010-09-09
 Resources:
-  AppSecGroup:
+  EC2SG43CA6:
     Type: "AWS::EC2::SecurityGroup"
     Properties:
       GroupDescription: The security group for the app.
       SecurityGroupIngress:
+        - IpProtocol: tcp
+          FromPort: 22
+          ToPort: 22
+          CidrIp: 0.0.0.0/0
         - IpProtocol: tcp
           FromPort: 80
           ToPort: 80
@@ -21,12 +25,26 @@ Resources:
     Type: "AWS::EC2::LaunchTemplate"
     Properties:
       LaunchTemplateData:
-        ImageId: ami-0b2ca94b5b49e0132
+        ImageId: ami-0e92f5873da29c633
         InstanceType: t2.nano
         KeyName: app-key
         SecurityGroups:
-          - !Ref AppSecGroup
-  AppAutoScale:
+          - !Ref EC2SG43CA6
+  ELBLB3PP2K:
+    Type: "AWS::ElasticLoadBalancing::LoadBalancer"
+    Properties:
+      AvailabilityZones:
+        - us-west-1a
+        - us-west-1c
+      Listeners:
+        - Protocol: HTTP
+          InstancePort: 80
+          LoadBalancerPort: 80
+        - Protocol: HTTPS
+          InstancePort: 443
+          LoadBalancerPort: 443
+          SSLCertificateId: arn:aws:acm:us-west-1:364031193056:certificate/ff4210ca-7625-44f3-a4e6-72d8c5b09d36
+  ASASG4CTVJ:
     Type: "AWS::AutoScaling::AutoScalingGroup"
     Properties:
       AutoScalingGroupName: AppAutoScaleGroup
@@ -39,3 +57,5 @@ Resources:
       LaunchTemplate:
         LaunchTemplateId: !Ref EC2LT4OGJE
         Version: 1
+      LoadBalancerNames:
+        - !Ref ELBLB3PP2K
