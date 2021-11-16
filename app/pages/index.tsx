@@ -25,7 +25,10 @@ const Home: NextPage = () => {
       <tbody>
         {data.map((emp) => {
           return (
-            <tr onClick={() => Router.push("/employees/" + emp._id)}>
+            <tr
+              onClick={() => Router.push("/employees/" + emp._id)}
+              key={emp._id}
+            >
               <td>{emp._id}</td>
               <td>{emp.first_name}</td>
               <td>{emp.last_name}</td>
