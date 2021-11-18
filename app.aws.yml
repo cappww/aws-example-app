@@ -1,9 +1,11 @@
 AWSTemplateFormatVersion: 2010-09-09
+
 Resources:
-  EC2SG43CA6:
+  # EC2 Web Server Stack
+  EC2SecurityGroup:
     Type: "AWS::EC2::SecurityGroup"
     Properties:
-      GroupDescription: The security group for the app.
+      GroupDescription: Opens ports for the web api server.
       SecurityGroupIngress:
         - IpProtocol: tcp
           FromPort: 22
@@ -21,7 +23,7 @@ Resources:
           FromPort: 3000
           ToPort: 3005
           CidrIp: 0.0.0.0/0
-  EC2LT4OGJE:
+  EC2LaunchTemplate:
     Type: "AWS::EC2::LaunchTemplate"
     Properties:
       LaunchTemplateData:
@@ -29,8 +31,8 @@ Resources:
         InstanceType: t2.nano
         KeyName: app-key
         SecurityGroups:
-          - !Ref EC2SG43CA6
-  ELBLB3PP2K:
+          - !Ref EC2SecurityGroup
+  ElasticLoadBalancer:
     Type: "AWS::ElasticLoadBalancing::LoadBalancer"
     Properties:
       AvailabilityZones:
@@ -44,7 +46,7 @@ Resources:
           InstancePort: 443
           LoadBalancerPort: 443
           SSLCertificateId: arn:aws:acm:us-west-1:364031193056:certificate/ff4210ca-7625-44f3-a4e6-72d8c5b09d36
-  ASASG4CTVJ:
+  AutoScalingGroup:
     Type: "AWS::AutoScaling::AutoScalingGroup"
     Properties:
       AutoScalingGroupName: AppAutoScaleGroup
@@ -55,10 +57,48 @@ Resources:
         - us-west-1a
         - us-west-1c
       LaunchTemplate:
-        LaunchTemplateId: !Ref EC2LT4OGJE
+        LaunchTemplateId: !Ref EC2LaunchTemplate
         Version: 1
       LoadBalancerNames:
-        - !Ref ELBLB3PP2K
-# RDS Instances
-# Two availability zones us-west-1a and c
-# MUST have a security group
+        - !Ref ElasticLoadBalancer
+
+  # Postgresql Cluster Stack
+  DBSecurityGroup:
+    Type: "AWS::EC2::SecurityGroup"
+    Properties:
+      GroupDescription: Opens the default Postgres port.
+      SecurityGroupIngress:
+        - IpProtocol: tcp
+          FromPort: 5432
+          ToPort: 5432
+          CidrIp: 0.0.0.0/0
+  DBCluster:
+    Type: "AWS::RDS::DBCluster"
+    DeletionPolicy: Delete
+    Properties:
+      Engine: aurora-postgresql
+      MasterUsername: postgres
+      MasterUserPassword: not_a_good_password_dont_use_this
+      AvailabilityZones:
+        - us-west-1a
+        - us-west-1c
+      VpcSecurityGroupIds:
+        - Fn::GetAtt: [DBSecurityGroup, GroupId]
+  DBInstance1:
+    Type: "AWS::RDS::DBInstance"
+    Properties:
+      AvailabilityZone: us-west-1a
+      DBClusterIdentifier:
+        Ref: DBCluster
+      DBInstanceClass: db.r5.large
+      Engine: aurora-postgresql
+      PubliclyAccessible: "true"
+  DBInstance2:
+    Type: "AWS::RDS::DBInstance"
+    Properties:
+      AvailabilityZone: us-west-1c
+      DBClusterIdentifier:
+        Ref: DBCluster
+      DBInstanceClass: db.r5.large
+      Engine: aurora-postgresql
+      PubliclyAccessible: "true"
